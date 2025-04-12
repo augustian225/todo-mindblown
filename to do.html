@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>✨ My Epic To-Do</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right bottom, #0f2027, #203a43, #2c5364);
+    }
+    .glass {
+      backdrop-filter: blur(15px);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.3);
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 text-white">
+
+  <div class="glass rounded-3xl shadow-2xl p-8 w-full max-w-2xl animate__animated animate__fadeIn">
+    <h1 class="text-4xl font-extrabold text-center text-blue-400 mb-6 tracking-wider">🚀 My Epic To-Do</h1>
+
+    <div class="flex gap-3 mb-6">
+      <input id="taskInput" type="text" placeholder="Add something amazing..." 
+        class="flex-grow px-5 py-4 rounded-xl bg-gray-900 text-white placeholder-gray-400 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+      <button onclick="addTask()" 
+        class="px-6 py-4 rounded-xl bg-blue-600 hover:bg-blue-500 transition font-bold text-white shadow-lg">Add</button>
+    </div>
+
+    <ul id="taskList" class="space-y-4 max-h-96 overflow-y-auto pr-2"></ul>
+
+    <div class="mt-6 text-center">
+      <button onclick="saveToFile()" 
+        class="px-5 py-3 rounded-xl bg-green-600 hover:bg-green-500 text-white font-bold shadow-lg transition-all">💾 Save to Desktop</button>
+    </div>
+
+    <div class="text-sm mt-6 text-center text-gray-400">✨ Double-click to mark done. Click ❌ to delete.</div>
+  </div>
+
+  <script>
+    function addTask() {
+      const input = document.getElementById("taskInput");
+      const taskText = input.value.trim();
+      if (taskText === "") return;
+
+      const li = document.createElement("li");
+      li.className = "bg-white bg-opacity-10 px-4 py-3 rounded-xl flex justify-between items-center hover:bg-opacity-20 transition";
+
+      const span = document.createElement("span");
+      span.textContent = taskText;
+      span.className = "flex-1";
+      span.ondblclick = () => {
+        span.classList.toggle("line-through");
+        span.classList.toggle("text-green-400");
+      };
+
+      const deleteBtn = document.createElement("button");
+      deleteBtn.textContent = "❌";
+      deleteBtn.className = "ml-4 hover:scale-110 transition";
+      deleteBtn.onclick = () => li.remove();
+
+      li.appendChild(span);
+      li.appendChild(deleteBtn);
+      document.getElementById("taskList").appendChild(li);
+
+      input.value = "";
+    }
+
+    function saveToFile() {
+      const tasks = document.querySelectorAll('li');
+      if (tasks.length === 0) {
+        alert("No tasks to save!");
+        return;
+      }
+
+      let content = '📝 Your To-Do List:\n\n';
+      tasks.forEach((task, index) => {
+        content += `${index + 1}. ${task.innerText.replace('❌', '').trim()}\n`;
+      });
+
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'My_TODO_List.txt';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // Optional: GSAP entry animation
+    gsap.from(".glass", { duration: 1.2, y: 80, opacity: 0, ease: "power4.out" });
+  </script>
+</body>
+</html>
